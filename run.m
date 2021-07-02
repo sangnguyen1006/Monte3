@@ -42,7 +42,7 @@
 %                         min=400nm
 %                         max=1100nm
 %                         >>khoi tao ma tran lamda=[400 401 ...1100]
-%   N                   - so luong photon mo phong cho tung buoc song
+%   N                   - So luong photon mo phong cho tung buoc song
 %                         N=10000, lamda=[400 1100]
 %                         >>tong photon mo phong= 7000000 hat
 %
@@ -58,8 +58,8 @@
 % Mo phong 1000000 hat trong ~117 s
 % -------------------------------------------------------------------------
 
-clear all
 %lay du lieu tu file.mat [lamda(nm), mua(1/cm), mus(1/cm), g(1/cm)]
+global V
 load('epi_interp.mat'); %lop bieu bi
 load('der_interp.mat'); %lop ha bi
 load('subf_interp.mat');%lop mo duoi da
@@ -70,12 +70,16 @@ n=[1.34 1.4 1.44 1.36 1.38]; %chiet suat cho tung lop mo n=[n1 n2 n3 n4]
 d=[0.01 0.2 0.6 0.15 5];%do sau cho tung lop mo (cm) d=[T1 T2 T3 T4]
   
 N=10000;%so hat cho tung lamda
+dr=0.005; dz=0.005;
 C=[];
 H1=zeros(1200);
 H2=zeros(1200);
 lamdaminmax=[400 1100];%khoang buoc song min=400nm, max =1100nm
 lamda=lamdaminmax(1):1:lamdaminmax(2);
 disp('Please wait...');
+%the tich cua phan thu luoi
+V=1:1:1200;
+V=(2*V+1)*pi*dr^2*dz; %(cm3)
 tic
 %//////////////////////////////////////////////////////////////////////////
 for i=1:length(lamda)
@@ -139,16 +143,26 @@ figure(1)
    set(colorbar,'fontsize',12)
 
 figure(2)
-   plot(x_plot(1:k),y_plot(1:k),'ko-');
-   title('Do lu thong F (J/cm2) theo chieu sau');
+   plot(x_plot(1:k),y_plot(1:k),'ko');
+   title('Do luu thong F (J/cm2) theo chieu sau');
    xlabel('Do sau Z (cm)');
    ylabel('Do luu loat F (J/cm2)');
    set(gca,'fontsize',12);
-  
+   p= polyfit(x_plot,y_plot,9);
+   zi= linspace(0,4);
+   hold on
+   pz=polyval(p,zi);
+   plot(zi,pz,'b','LineWidth',3);
+   legend('Duong cong luu thong F thuc te','Duong cong luu thong F min hoa');
+ 
 figure(3)
    plot(lamda,C,'ko');
    title('Mat do nang luong hap thu (J/cm3) o moi buoc song');
    xlabel('Buoc song (nm)');
    ylabel('Mat do nang luong hap thu (J/cm3)');
    set(gca,'fontsize',12);
- 
+   v1=polyfit(lamda,C,9);
+   vz=polyval(v1,lamda);
+   hold on
+   plot(lamda,vz,'b','LineWidth',3);
+   legend('Duong cong mat do nang luong hap thu thuc te','Duong cong mat do nang luong hap thu min hoa');
